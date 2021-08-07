@@ -1,2 +1,2 @@
-# ComputerCraft scripts for Powah mod
-A bundle of ComputerCraft scripts for Powah, the Minecraft mod.
+# ComputerCraft scripts for Minecraft mods
+A bundle of ComputerCraft scripts for Minecraft mods, including Powah and Astral sorcery.
