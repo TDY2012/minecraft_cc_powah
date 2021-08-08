@@ -5,6 +5,7 @@ NAME_CHAT_BOX = 'chatBox'
 NAME_AR_CONTROLLER = 'arController'
 CMD_DRAW = '!sky_draw'
 CMD_CLEAR = '!sky_clear'
+CMD_LOG = '!sky_log'
 TIME_MINECRAFT_DAY_TICK = 0
 TIME_MINECRAFT_NIGHT_TICK = 12000
 INTERVAL_MINECRAFT_DAY_TICK = 24000
@@ -30,10 +31,10 @@ CONSTELLATION_TABLE = {
 }
 
 -- Construct moon id to constellation table
-INVERTED_CONSTALLATION_TABLE = { [0]={}, [1]={}, [2]={}, [3]={}, [4]={}, [5]={}, [6]={}, [7]={} }
+INVERTED_CONSTELLATION_TABLE = { [0]={}, [1]={}, [2]={}, [3]={}, [4]={}, [5]={}, [6]={}, [7]={} }
 for constellation, moonIdTable in pairs( CONSTELLATION_TABLE ) do
     for _, moonId in pairs( moonIdTable ) do
-        table.insert( INVERTED_CONSTALLATION_TABLE[ moonId ], constellation )
+        table.insert( INVERTED_CONSTELLATION_TABLE[ moonId ], constellation )
     end
 end
 
@@ -41,6 +42,19 @@ SPECIAL_CONSTELLATION_TABLE = {
     'Horologium',
     'Pelotrio'
 }
+
+function logConstellationTable( peripheralChatBoxController )
+
+    -- Display constellation table in chat message
+    local logMessage = ''
+    local availableConstellationStr
+    for moonId, constallationTable in pairs( INVERTED_CONSTELLATION_TABLE ) do
+        availableConstellationStr = table.concat( INVERTED_CONSTELLATION_TABLE[ moonId ], ', ' )
+        logMessage = logMessage .. 'Moon (id) ' .. moonId .. ', Constellation : ' .. availableConstellationStr .. '\n'
+    end
+    peripheralChatBoxController.sendMessage( logMessage )
+
+end
 
 function draw( peripheralEnvironmentDetector, peripheralArController, firstSolarEclipseDate )
 
@@ -73,7 +87,7 @@ function draw( peripheralEnvironmentDetector, peripheralArController, firstSolar
     -- Get moon
     local moonId = peripheralEnvironmentDetector.getMoonId()
     local moonName = peripheralEnvironmentDetector.getMoonName()
-    local availableConstellationStr = table.concat( INVERTED_CONSTALLATION_TABLE[ moonId ], ', ' )
+    local availableConstellationStr = table.concat( INVERTED_CONSTELLATION_TABLE[ moonId ], ', ' )
 
     -- Draw moon and constellation
     peripheralArController.drawItemIcon( 'astralsorcery:constellation_paper', -20, 39 )
@@ -153,7 +167,8 @@ function main()
 
     print( 'To use this program, bind the AR Goggles to the AR Controller and type these commands in the chat box.\n' ..
         '1. !sky_draw : Redraw the sky information.\n' ..
-        '2. !sky_clear : Clear the screen.' )
+        '2. !sky_clear : Clear the screen.\n' ..
+        '3. !sky_log : Display constellation table in chat message.' )
 
     local event, username, message
 
@@ -168,6 +183,9 @@ function main()
         elseif message == CMD_DRAW then
             print('User [' .. username .. '] called ' .. CMD_DRAW .. '.')
             draw( peripheralEnvironmentDetector, peripheralArController, firstSolarEclipseDate )
+        elseif message == CMD_LOG then
+            print('User [' .. username .. '] called ' .. CMD_LOG .. '.')
+            logConstellationTable( peripheralChatBoxController )
         end
 
         -- I still have a performance concern for this program, so a little sleep here
