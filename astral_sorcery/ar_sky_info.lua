@@ -76,12 +76,30 @@ function draw( peripheralEnvironmentDetector, peripheralArController, firstSolar
     local availableConstellationStr = table.concat( INVERTED_CONSTALLATION_TABLE[ moonId ], ', ' )
 
     -- Draw moon and constellation
-    peripheralArController.drawItemIcon( 'astralsorcery:perk_seal', -20, 39 )
+    peripheralArController.drawItemIcon( 'astralsorcery:constellation_paper', -20, 39 )
     peripheralArController.drawRightboundString( 'Moon (id/name) : ' .. moonId .. '/' .. moonName, -20, 39, 0xFFFFFF )
     peripheralArController.drawRightboundString( 'Constellation : ' .. availableConstellationStr, -20, 49, 0xFFFFFF )
 
-    -- WIP
-    -- Compute Horologium availability
+    -- Get next solar eclipse day
+    local nextSolarEclipseMessage = 'N/A'
+    if firstSolarEclipseDate ~= nil then
+
+        -- Compute next solar eclipse day
+        local nextSolarEclipseDay = INTERVAL_SOLAR_ECLIPSE_DAY - ( ( todayDate - firstSolarEclipseDate ) % INTERVAL_SOLAR_ECLIPSE_DAY )
+        
+        -- Set the display message regarding to the next solar eclipse day
+        if nextSolarEclipseDay == INTERVAL_SOLAR_ECLIPSE_DAY then
+            nextSolarEclipseMessage = 'TODAY!!!'
+        else
+            local nextSolarEclipseDate = todayDate + nextSolarEclipseDay
+            nextSolarEclipseMessage = 'Day ' .. nextSolarEclipseDate .. ' (' .. nextSolarEclipseDay .. ' day(s))'
+        end
+
+    end
+
+    -- Draw next solar eclipse day
+    peripheralArController.drawItemIcon( 'astralsorcery:observatory', -20, 61 )
+    peripheralArController.drawRightboundString( 'Next solar eclipse : ' .. nextSolarEclipseMessage, -20, 61, 0xFFFFFF )
 
 end
 
@@ -145,8 +163,10 @@ function main()
 
         -- Parse chat message to command
         if message == CMD_CLEAR then
+            print('User [' .. username .. '] called ' .. CMD_CLEAR .. '.')
             peripheralArController.clear()
         elseif message == CMD_DRAW then
+            print('User [' .. username .. '] called ' .. CMD_DRAW .. '.')
             draw( peripheralEnvironmentDetector, peripheralArController, firstSolarEclipseDate )
         end
 
